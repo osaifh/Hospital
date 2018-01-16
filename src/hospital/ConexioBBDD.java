@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class ConexioBBDD {
     private static ConexioBBDD instance;
     private Connection connection;
-    private String url = "";//adreça de la base de dades
+    private String url = "jdbc:mysql://localhost:3306/mysql"; //adreça de la base de dades
     private String username = "root";
     private String password = "";
     

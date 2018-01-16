@@ -9,6 +9,7 @@ public class Doctor extends Persona {
 
     public Doctor() {
     }
+    
     public Doctor(String posicio, Date dataInici, Departament departament) {
         this.posicio = posicio;
         this.dataInici = dataInici;

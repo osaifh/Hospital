@@ -4,14 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConexioBBDD {
-    private static ConexioBBDD instance;
+public class ConnexioBBDD {
+    private static ConnexioBBDD instance;
     private Connection connection;
     private String url = "jdbc:mysql://localhost:3306/mysql"; //adreça de la base de dades
     private String username = "root";
     private String password = "";
     
-    private ConexioBBDD() throws SQLException {
+    private ConnexioBBDD() throws SQLException {
         try {
             this.connection = DriverManager.getConnection(url, username, password);
         }
@@ -20,9 +20,9 @@ public class ConexioBBDD {
         }
     }
     
-    public static ConexioBBDD getInstance() throws SQLException {
+    public static ConnexioBBDD getInstance() throws SQLException {
         if (instance == null){
-            instance = new ConexioBBDD();
+            instance = new ConnexioBBDD();
         }
         return instance;
     }

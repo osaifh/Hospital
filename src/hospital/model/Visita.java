@@ -1,6 +1,8 @@
 package hospital.model;
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Visita {
 
@@ -11,6 +13,16 @@ public class Visita {
     private Doctor doctor;
 
     public Visita() {
+    }
+    
+    public Visita(ResultSet rs) throws SQLException {
+        try {
+          motiu = rs.getString("motiu");
+          dataVisita = rs.getDate("dataVisita");
+          ID = rs.getInt("visitaID");
+        } catch (SQLException ex) {
+            throw (ex);
+        }
     }
 
     public Visita(int ID, Date dataVisita, String motiu, Pacient pacient, Doctor doctor) {
@@ -59,6 +71,11 @@ public class Visita {
 
     public void setDoctor(Doctor doctor) {
         this.doctor = doctor;
+    }
+
+    @Override
+    public String toString() {
+        return "Visita{" + "ID=" + ID + ", dataVisita=" + dataVisita + ", motiu=" + motiu + "\n" + pacient.toString() + "\n" + doctor.toString() + "\n}";
     }
 
 }

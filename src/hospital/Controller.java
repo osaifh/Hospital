@@ -4,7 +4,6 @@ import hospital.model.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 public class Controller {
     private ConnexioBBDD connexio;
@@ -71,6 +70,57 @@ public class Controller {
                 visita.setDoctor(getDoctor(rs.getInt("doctorID")));
                 visita.setPacient(getPacient(rs.getInt("pacientID")));
                 resultat.append(visita.toString());
+                resultat.append("\n");
+            }
+        }
+        catch (SQLException ex){
+            System.out.println("Error en la consulta: " + ex.toString());
+        }
+        return resultat.toString();
+    }
+    
+    public String getTaulaDepartament(){
+        StringBuilder resultat = new StringBuilder();
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareStatement("SELECT * FROM hospital.departament");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()){
+                Departament departament = new Departament(rs);
+                resultat.append(departament.toString());
+                resultat.append("\n");
+            }
+        }
+        catch (SQLException ex){
+            System.out.println("Error en la consulta: " + ex.toString());
+        }
+        return resultat.toString();
+    }
+    
+    public String getTaulaHabitacions(){
+        StringBuilder resultat = new StringBuilder();
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareCall("SELECT * FROM hospital.habitacio");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()){
+                Habitacio habitacio = new Habitacio(rs);
+                resultat.append(habitacio.toString());
+                resultat.append("\n");
+            }
+        }
+        catch (SQLException ex){
+            System.out.println("Error en la consulta: " + ex.toString());
+        }
+        return resultat.toString();
+    }
+    
+    public String getTaulaEdificis(){
+        StringBuilder resultat = new StringBuilder();
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareCall("SELECT * FROM hospital.edifici");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()){
+                Edifici edifici = new Edifici(rs);
+                resultat.append(edifici.toString());
                 resultat.append("\n");
             }
         }
@@ -181,6 +231,63 @@ public class Controller {
         return null;
     }
     
+    public Departament getDepartament(int departamentID){
+        Departament departament = null;
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareStatement("SELECT * FROM hospital.departament WHERE (departamentID = (?))");
+            stat.setInt(1, departamentID);
+            ResultSet rs = stat.executeQuery();
+            if (rs.first()){
+                departament = new Departament(rs);
+            }
+        }
+        catch (SQLException ex){
+            System.out.println("Error en la consulta: " + ex.toString());
+        }
+        return departament;
+    }
+    
+    public Edifici getEdifici(int edificiID){
+        Edifici edifici = null;
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareStatement("SELECT * FROM hospital.edifici WHERE (hospitalID = (?)");
+            stat.setInt(1, edificiID);
+            ResultSet rs = stat.executeQuery();
+            if (rs.first()){
+                edifici = new Edifici(rs);
+            }
+        }
+        catch (SQLException ex){
+            System.out.println("Error en la consulta: " + ex.toString());
+        }
+        return edifici;
+    }
+    
+    public void crearPacient(Pacient pacient){
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareCall("INSERT INTO hospital.persona(personaID,DNI,dataNaixement,nom,cognom1,cognom2) VALUES (DEFAULT,?,?,?,?,?)");
+            stat.setString(1, pacient.getDNI());
+            stat.setDate(2, pacient.getDataNaixement());
+            stat.setString(3, pacient.getNom());
+            stat.setString(4, pacient.getCognom1());
+            stat.setString(5, pacient.getCognom2());
+            stat.execute();
+            PreparedStatement stat2 = connexio.getConnection().prepareStatement("SELECT personaID FROM hospital.persona WHERE (DNI = (?))");
+            stat2.setString(1, pacient.getDNI());
+            ResultSet rs = stat2.executeQuery();
+            if (rs.first()){
+                int id = rs.getInt("personaID");
+                PreparedStatement stat3 = connexio.getConnection().prepareCall("Insert INTO hospital.pacient(pacientID, dataAlta, dataBaixa) VALUES (?,NULL,NULL)");
+                stat3.setInt(1, id);
+                stat3.execute();
+                System.out.println("S'ha creat el pacient correctament");
+            }
+        }
+        catch (SQLException ex){
+            System.out.println("Error en la creació de nou pacient: " + ex.toString());
+        }
+    }
+    
     public void crearVisita(Visita visita){
         try {
             //INSERT INTO Visita(visitaID, dataVisita, motiu, doctorID, pacientID) VALUES (1,'2018-01-05',"Visita rutinaria",2,5);
@@ -191,10 +298,46 @@ public class Controller {
             stat.setInt(3, visita.getDoctor().getPersonaID());
             stat.setInt(4, visita.getPacient().getPersonaID());
             stat.execute();
+            System.out.println("S'ha creat la nova visita correctament");
         }
         catch (SQLException ex){
-            System.out.println("Error en la consulta: " + ex.toString());
+            System.out.println("Error en creació de nova visita: " + ex.toString());
         }
     }
     
+    public void altaPacient(Pacient pacient){
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareStatement("UPDATE hospital.pacient SET dataAlta = NOW(), dataBaixa = NULL WHERE (pacientID = (?))");
+            stat.setInt(1, pacient.getPersonaID());
+            stat.execute();
+            System.out.println("S'ha donat d'alta el pacient correctament");
+        }
+        catch (SQLException ex){
+            System.out.println("Error al donar d'alta el pacient: " + ex.toString());
+        }
+    }
+    
+    public void baixaPacient(Pacient pacient){
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareStatement("UPDATE hospital.pacient SET dataBaixa = NOW() WHERE (pacientID = (?))");
+            stat.setInt(1, pacient.getPersonaID());
+            stat.execute();
+            System.out.println("S'ha donat de baixa el pacient correctament");
+        }
+        catch (SQLException ex){
+            System.out.println("Error al donar de baixa el pacient: " + ex.toString());
+        }
+    }
+    
+    public void esborrarPacient(Pacient pacient){
+        try {
+            PreparedStatement stat = connexio.getConnection().prepareStatement("DELETE FROM hospital.pacient WHERE (pacientID = (?))");
+            stat.setInt(1, pacient.getPersonaID());
+            stat.execute();
+            System.out.println("S'ha esborrat el pacient correctament");
+        }
+        catch (SQLException ex){
+            System.out.println("Error al donar de baixa el pacient: " + ex.toString());
+        }
+    }
 }

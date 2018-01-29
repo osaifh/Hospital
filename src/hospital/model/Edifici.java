@@ -1,5 +1,8 @@
 package hospital.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Edifici {
     private int ID;
     private String nom;
@@ -12,6 +15,11 @@ public class Edifici {
         this.nom = nom;
     }
 
+    public Edifici (ResultSet rs) throws SQLException{
+        ID = rs.getInt("edificiID");
+        nom = rs.getString("nom");
+    }
+    
     public int getID() {
         return ID;
     }
@@ -26,6 +34,11 @@ public class Edifici {
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    @Override
+    public String toString() {
+        return "Edifici{" + "ID=" + ID + ", nom=" + nom + '}';
     }
     
 }

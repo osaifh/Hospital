@@ -59,7 +59,10 @@ public class Doctor extends Persona {
     public void setDepartament(Departament departament) {
         this.departament = departament;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Doctor{"  + super.toString() + "posicio=" + posicio + ", dataInici=" + dataInici + ", departament=" + departament + '}';
+    }
     
 }

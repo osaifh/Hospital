@@ -26,7 +26,8 @@ public class Hospital {
             controlador = new Controller(connexio);
             int userOption;
             do {
-                System.out.print("Opcio 1: veure dades\n"
+                System.out.print(
+                           "Opcio 1: veure dades\n"
                         + "Opcio 2: afegir cita\n"
                         + "Opcio 3: alta pacient\n"
                         + "Opcio 4: baixa pacient\n"
@@ -40,28 +41,22 @@ public class Hospital {
                 }
                 switch (userOption) {
                     case 1:
-                        String something = controlador.getTaulaVisita();
-                        System.out.println(something);
+                        veureTaula();
                         break;
                     case 2:
-                        //afegir cita
-                        String s = controlador.getTaulaPacients();
-                        System.out.println(s);
-                        s = controlador.getTaulaDoctors();
-                        System.out.println(s);
                         afegirVisita();
                         break;
                     case 3:
-                        //alta pacient
+                        donarAlta();
                         break;
                     case 4:
-                        //baixa pacient
+                        donarBaixa();
                         break;
                     case 5:
-                        //afegir nou pacient
+                        afegirPacient();
                         break;
                     case 6:
-                        //esborrar pacient
+                        esborrarPacient();
                         break;
                     default:
                         System.out.println("Error: input incorrecte");
@@ -69,18 +64,6 @@ public class Hospital {
                 }
 
             } while (userOption != 0);
-            /*
-            try {
-                PreparedStatement stat = connexio.getConnection().prepareStatement("SELECT * FROM hospital.doctor");
-                 ResultSet rs = stat.executeQuery();
-                 while (rs.next()){
-                     System.out.println("posicio: " + rs.getString("posicio"));
-                 }
-            }
-            catch (SQLException ex){
-                System.out.println("Error en la consulta: " + ex.toString());
-            }*/
-
             System.out.println("Tancant conexió");
             connexio.getConnection().close();
         } catch (SQLException ex) {
@@ -88,29 +71,155 @@ public class Hospital {
         }
     }
 
-    
-
-    public static void afegirVisita() throws SQLException {
-        Visita visita = new Visita();
-        System.out.println("Introdueix el DNI del pacient");
-        visita.setPacient(controlador.getPacient(userInput.nextLine()));
-        System.out.println("Introdueix el DNI del doctor");
-        visita.setDoctor(controlador.getDoctor(userInput.nextLine()));
-        System.out.println("Introdueix el motiu de la visita:");
-        visita.setMotiu(userInput.nextLine());
-        System.out.println("Introdueix la data de la visita en format dd/mm/yyyy");
-        try {
-            String date = userInput.nextLine();
-            int day, month, year;
-            String[] _date = date.split("/");
-            day = Integer.parseInt(_date[0]);
-            month = Integer.parseInt(_date[1]);
-            year = Integer.parseInt(_date[2]);
-            java.sql.Date data = new java.sql.Date(year, month, day);
-            visita.setDataVisita(data);
-            controlador.crearVisita(visita);
-        } catch (NumberFormatException ex) {
-            System.out.println("Error: format incorrecte");
+    private static void veureTaula() throws SQLException {
+        int userOption;
+        String informacioTaula = "";
+        do {
+            System.out.print("Quina taula vols veure?\n"
+                                    + "1. Departaments\n"
+                                    + "2. Doctors\n"
+                                    + "3. Pacients\n"
+                                    + "4. Visites\n"
+                                    + "5. Habitacions\n"
+                                    + "6. Edificis\n"
+                                    + "0. Cancelar\n");
+            try {
+                userOption = Integer.parseInt(userInput.nextLine());
+            } catch (NumberFormatException ex) {
+                userOption = -1;
+            }
+            switch (userOption) {
+                case 1:
+                    System.out.println("Informació de la taula Departament:");
+                    informacioTaula = controlador.getTaulaDepartament();
+                    break;
+                case 2:
+                    System.out.println("Informació de la taula Doctors:");
+                    informacioTaula = controlador.getTaulaDoctors();
+                    break;
+                case 3:
+                    System.out.println("Informació de la taula Pacients:");
+                    informacioTaula = controlador.getTaulaPacients();
+                    break;
+                case 4:
+                    System.out.println("Informació de la taula Visites:");
+                    informacioTaula = controlador.getTaulaVisita();
+                    break;
+                case 5:
+                    System.out.println("Informacio de la taula habitacions:");
+                    informacioTaula = controlador.getTaulaHabitacions();
+                    break;
+                case 6:
+                    System.out.println("Informació de la taula edificis:");
+                    informacioTaula = controlador.getTaulaEdificis();
+                    break;
+                default:
+                    System.out.println("Error: input incorrecte");
+                    break;
+            }
+        } while (userOption < 0 || userOption > 6);
+        if (userOption != 0){
+            System.out.println(informacioTaula);
+        }
+        else {
+            System.out.println("S'ha cancelat l'acció");
         }
     }
+
+    private static void afegirPacient() throws SQLException {
+        try {
+            Pacient pacient = new Pacient();
+            System.out.println("Introdueix el DNI del pacient");
+            pacient.setDNI(userInput.nextLine());
+            System.out.println("Introdueix el nom del pacient");
+            pacient.setNom(userInput.nextLine());
+            System.out.println("Introdueix el primer cognom del pacient");
+            pacient.setCognom1(userInput.nextLine());
+            System.out.println("Introdueix el segon nom del pacient");
+            pacient.setCognom2(userInput.nextLine());
+            System.out.println("Introdueix la data de naixement en format dd/mm/yyyy");
+            pacient.setDataNaixement(getData(userInput.nextLine()));
+            controlador.crearPacient(pacient);
+        }
+        catch (NumberFormatException ex) {
+            System.out.println("Error: format d'entrada incorrecte");
+        }
+        catch(NullPointerException ex){
+            System.out.println("Error: dades invalides");
+        }
+    }
+    
+    private static void afegirVisita() throws SQLException {
+        try {
+            Visita visita = new Visita();
+            System.out.println("Introdueix el DNI del pacient");
+            visita.setPacient(controlador.getPacient(userInput.nextLine()));
+            System.out.println("Introdueix el DNI del doctor");
+            visita.setDoctor(controlador.getDoctor(userInput.nextLine()));
+            System.out.println("Introdueix el motiu de la visita:");
+            visita.setMotiu(userInput.nextLine());
+            System.out.println("Introdueix la data de la visita en format dd/mm/yyyy");
+            visita.setDataVisita(getData(userInput.nextLine()));
+            controlador.crearVisita(visita);
+        } catch (NumberFormatException ex) {
+            System.out.println("Error: format d'entrada incorrecte");
+        }
+        catch(NullPointerException ex){
+            System.out.println("Error: dades invalides");
+        }
+    }
+    
+    private static void donarAlta() throws SQLException {
+        System.out.println("Introdueix el DNI del pacient");
+        Pacient pacient = controlador.getPacient(userInput.nextLine());
+        if (pacient != null){
+            if (pacient.getDataAlta() != null){
+                System.out.println("Error: aquest pacient ja esta donat d'alta");
+            }
+            else {
+                controlador.altaPacient(pacient);
+            }
+        }
+        else {
+            System.out.println("Error: el pacient especificat no existeix");
+        }
+    }
+    
+    private static void donarBaixa() throws SQLException {
+        System.out.println("Introdueix el DNI del pacient");
+        Pacient pacient = controlador.getPacient(userInput.nextLine());
+        if (pacient != null){
+            if (pacient.getDataAlta() == null){
+                System.out.println("Error: aquest pacient no esta donat d'alta");
+            }
+            else {
+                controlador.baixaPacient(pacient);
+            }
+        }
+        else {
+            System.out.println("Error: el pacient especificat no existeix");
+        }
+    }
+    
+    private static void esborrarPacient() {
+        System.out.println("Introdueix el DNI del pacient");
+        Pacient pacient = controlador.getPacient(userInput.nextLine());
+        if (pacient != null){
+            controlador.esborrarPacient(pacient);
+        }
+        else {
+            System.out.println("Error: el pacient especificat no existeix");
+        }
+    }
+    
+    private static java.sql.Date getData(String input){
+        int day, month, year;
+        String[] _date = input.split("/");
+        day = Integer.parseInt(_date[0]);
+        month = Integer.parseInt(_date[1]);
+        year = Integer.parseInt(_date[2]);
+        java.sql.Date data = new java.sql.Date(year, month, day);
+        return data;
+    }
+
 }

@@ -1,5 +1,8 @@
 package hospital.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Habitacio {
     private int ID;
     private boolean lliure;
@@ -8,7 +11,12 @@ public class Habitacio {
 
     public Habitacio() {
     }
-
+    
+    public Habitacio(ResultSet rs) throws SQLException{
+        ID = rs.getInt("habitacioID");
+        lliure = rs.getBoolean("lliure");
+    }
+    
     public Habitacio(int ID, boolean lliure, Edifici edifici, Pacient pacient) {
         this.ID = ID;
         this.lliure = lliure;
@@ -48,5 +56,9 @@ public class Habitacio {
         this.pacient = pacient;
     }
     
-    
+    @Override
+    public String toString() {
+        return "Habitacio{" + "ID=" + ID + ", lliure=" + lliure + '}';
+    }
+
 }

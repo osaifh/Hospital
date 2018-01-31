@@ -20,6 +20,11 @@ public class ConnexioBBDD {
         }
     }
     
+    /**
+     * Retorna la instancia de connexió amb la base de dades
+     * @return la instancia de connexió amb la base de dades
+     * @throws SQLException Error SQL
+     */
     public static ConnexioBBDD getInstance() throws SQLException {
         if (instance == null){
             instance = new ConnexioBBDD();
@@ -27,6 +32,10 @@ public class ConnexioBBDD {
         return instance;
     }
     
+    /**
+     * retorna la connexió a la base de dades
+     * @return la connexió a la base de dades
+     */
     public Connection getConnection(){
         return connection;
     }

@@ -25,6 +25,7 @@ public class Hospital {
             System.out.println("Conexio realitzada");
             controlador = new Controller(connexio);
             int userOption;
+            //menu principal
             do {
                 System.out.print(
                            "Opcio 1: veure dades\n"
@@ -71,6 +72,10 @@ public class Hospital {
         }
     }
 
+    /**
+     * Menu en el que es mostren les opcions que permeten especificar quina taula es vol mostrar
+     * @throws SQLException error SQL
+     */
     private static void veureTaula() throws SQLException {
         int userOption;
         String informacioTaula = "";
@@ -126,6 +131,10 @@ public class Hospital {
         }
     }
 
+    /**
+     * acció d'afegir un client a la base de dades
+     * @throws SQLException Error SQL
+     */
     private static void afegirPacient() throws SQLException {
         try {
             Pacient pacient = new Pacient();
@@ -149,6 +158,10 @@ public class Hospital {
         }
     }
     
+    /**
+     * Acció d'afegir una nova visita a la base de dades
+     * @throws SQLException Error SQL
+     */
     private static void afegirVisita() throws SQLException {
         try {
             Visita visita = new Visita();
@@ -169,6 +182,10 @@ public class Hospital {
         }
     }
     
+    /**
+     * Acció de donar d'alta a un pacient
+     * @throws SQLException Error SQL
+     */
     private static void donarAlta() throws SQLException {
         System.out.println("Introdueix el DNI del pacient");
         Pacient pacient = controlador.getPacient(userInput.nextLine());
@@ -185,6 +202,10 @@ public class Hospital {
         }
     }
     
+    /**
+     * Acció de donar de baixa a un pacient
+     * @throws SQLException Error SQL
+     */
     private static void donarBaixa() throws SQLException {
         System.out.println("Introdueix el DNI del pacient");
         Pacient pacient = controlador.getPacient(userInput.nextLine());
@@ -201,6 +222,9 @@ public class Hospital {
         }
     }
     
+    /**
+     * Acció d'esborrar un pacient de la base de dades
+     */
     private static void esborrarPacient() {
         System.out.println("Introdueix el DNI del pacient");
         Pacient pacient = controlador.getPacient(userInput.nextLine());
@@ -212,6 +236,11 @@ public class Hospital {
         }
     }
     
+    /**
+     * Parseja una data de un input per convertir-la a un format que SQL pugui interpretar
+     * @param input la data en format string
+     * @return la data en format java.sql.Date
+     */
     private static java.sql.Date getData(String input){
         int day, month, year;
         String[] _date = input.split("/");

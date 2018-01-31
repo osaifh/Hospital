@@ -6,12 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Controller {
+    //la connexió a la base de dades sobre el que es realitzen totes les queries i consultes
     private ConnexioBBDD connexio;
     
     public Controller(ConnexioBBDD connexio) {
         this.connexio = connexio;
     }
     
+    /**
+     * Retorna el contingut de la taula de doctors en format string
+     * @return el contingut de la taula de doctors en format string
+     */
     public String getTaulaDoctors(){
        StringBuilder resultat = new StringBuilder();
        try {
@@ -36,6 +41,10 @@ public class Controller {
        return (resultat.toString());
     } 
     
+    /**
+     * Retorna el contingut de la taula de pacients en format string
+     * @return el contingut de la taula de pacients en format string
+     */
     public String getTaulaPacients(){
        StringBuilder resultat = new StringBuilder();
        try {
@@ -60,6 +69,10 @@ public class Controller {
        return (resultat.toString());
     }
     
+    /**
+     * Retorna el contingut de la taula de visites en format string
+     * @return el contingut de la taula de visites en format string
+     */
     public String getTaulaVisita(){
         StringBuilder resultat = new StringBuilder();
         try {
@@ -79,6 +92,10 @@ public class Controller {
         return resultat.toString();
     }
     
+    /**
+     * Retorna el contingut de la taula de departaments en format string
+     * @return el contingut de la taula de departaments en format string
+     */
     public String getTaulaDepartament(){
         StringBuilder resultat = new StringBuilder();
         try {
@@ -96,6 +113,10 @@ public class Controller {
         return resultat.toString();
     }
     
+    /**
+     * Retorna el contingut de la taula de departaments en format string
+     * @return el contingut de la taula de departaments en format string
+     */
     public String getTaulaHabitacions(){
         StringBuilder resultat = new StringBuilder();
         try {
@@ -113,6 +134,10 @@ public class Controller {
         return resultat.toString();
     }
     
+    /**
+     * Retorna el contingut de la taula d'edificis en format string
+     * @return el contingut de la taula de d'edificis en format string
+     */
     public String getTaulaEdificis(){
         StringBuilder resultat = new StringBuilder();
         try {
@@ -130,6 +155,11 @@ public class Controller {
         return resultat.toString();
     }
     
+    /**
+     * Retorna un objecte pacient amb totes les seves dades en base al seu DNI
+     * @param DNI el DNI del pacient que volem obtenir
+     * @return el pacient corresponent al DNI d'entrada
+     */
     public Pacient getPacient(String DNI){
         Pacient pacient;
         try {
@@ -156,6 +186,11 @@ public class Controller {
         return null;
     }
     
+    /**
+     * Retorna un objecte doctor amb totes les seves dades en base al seu DNI
+     * @param DNI el DNI del doctor que volem obtenir
+     * @return el doctor corresponent al DNI d'entrada
+     */
     public Doctor getDoctor(String DNI){
         Doctor doctor;
         try {
@@ -181,6 +216,12 @@ public class Controller {
         }
         return null;
     }
+    
+     /**
+     * Retorna un objecte pacient amb totes les seves dades en base a la seva ID
+     * @param personaID la ID del pacient que volem obtenir
+     * @return el pacient corresponent a la ID d'entrada
+     */
     public Pacient getPacient(int personaID){
         Pacient pacient;
         try {
@@ -206,18 +247,23 @@ public class Controller {
         return null;
     }
     
-    public Doctor getDoctor(int doctorID){
+     /**
+     * Retorna un objecte pacient amb totes les seves dades en base a la seva ID
+     * @param personaID la ID del doctor que volem obtenir
+     * @return el doctor corresponent a la ID d'entrada
+     */
+    public Doctor getDoctor(int personaID){
         Doctor doctor;
         try {
             PreparedStatement stat = connexio.getConnection().prepareStatement("SELECT * FROM hospital.persona WHERE (personaID = (?))");
-            stat.setInt(1, doctorID);
+            stat.setInt(1, personaID);
             ResultSet rs = stat.executeQuery();
             if (rs.first()){
                 doctor = new Doctor();
                 doctor.setPersonaData(rs);
-                doctor.setPersonaID(doctorID);
+                doctor.setPersonaID(personaID);
                 PreparedStatement stat2 = connexio.getConnection().prepareStatement("SELECT * FROM hospital.doctor WHERE (doctorID = (?))");
-                stat2.setInt(1, doctorID);
+                stat2.setInt(1, personaID);
                 ResultSet rs2 = stat2.executeQuery();
                 if (rs2.first()){
                     doctor.setDoctorData(rs2);
@@ -231,6 +277,11 @@ public class Controller {
         return null;
     }
     
+    /**
+     * Retorna el departament corresponent a una ID
+     * @param departamentID la ID del departament que volem obtenir
+     * @return el departament corresponent a la ID d'entrada
+     */
     public Departament getDepartament(int departamentID){
         Departament departament = null;
         try {
@@ -247,6 +298,11 @@ public class Controller {
         return departament;
     }
     
+     /**
+     * Retorna l'edifici corresponent a una ID
+     * @param edificiID la ID de l'edifici que volem obtenir
+     * @return l'edifici corresponent a la ID d'entrada
+     */
     public Edifici getEdifici(int edificiID){
         Edifici edifici = null;
         try {
@@ -263,6 +319,10 @@ public class Controller {
         return edifici;
     }
     
+    /**
+     * Crear un pacient a la base de dades
+     * @param pacient l'objecte pacient local que volem crear
+     */
     public void crearPacient(Pacient pacient){
         try {
             PreparedStatement stat = connexio.getConnection().prepareCall("INSERT INTO hospital.persona(personaID,DNI,dataNaixement,nom,cognom1,cognom2) VALUES (DEFAULT,?,?,?,?,?)");
@@ -288,11 +348,13 @@ public class Controller {
         }
     }
     
+    /**
+     * Crear una visita a la base de dades
+     * @param visita l'objecte visita local que volem crear
+     */
     public void crearVisita(Visita visita){
         try {
-            //INSERT INTO Visita(visitaID, dataVisita, motiu, doctorID, pacientID) VALUES (1,'2018-01-05',"Visita rutinaria",2,5);
             PreparedStatement stat = connexio.getConnection().prepareStatement("INSERT INTO hospital.visita(visitaID, dataVisita, motiu, doctorID, pacientID) VALUES (DEFAULT,?,?,?,?)");
-            //stat.setString(1, "DEFAULT");
             stat.setDate(1, visita.getDataVisita());
             stat.setString(2, visita.getMotiu());
             stat.setInt(3, visita.getDoctor().getPersonaID());
@@ -305,6 +367,10 @@ public class Controller {
         }
     }
     
+    /**
+     * Dona d'alta a un pacient
+     * @param pacient el pacient que volem donar d'alta
+     */
     public void altaPacient(Pacient pacient){
         try {
             PreparedStatement stat = connexio.getConnection().prepareStatement("UPDATE hospital.pacient SET dataAlta = NOW(), dataBaixa = NULL WHERE (pacientID = (?))");
@@ -317,6 +383,10 @@ public class Controller {
         }
     }
     
+    /**
+     * Dona de baixa a un pacient
+     * @param pacient el pacient que volem donar de baixa
+     */
     public void baixaPacient(Pacient pacient){
         try {
             PreparedStatement stat = connexio.getConnection().prepareStatement("UPDATE hospital.pacient SET dataBaixa = NOW() WHERE (pacientID = (?))");
@@ -329,6 +399,10 @@ public class Controller {
         }
     }
     
+    /**
+     * Esborra un pacient de la base de dades
+     * @param pacient el pacient que volem esborrar
+     */
     public void esborrarPacient(Pacient pacient){
         try {
             PreparedStatement stat = connexio.getConnection().prepareStatement("DELETE FROM hospital.pacient WHERE (pacientID = (?))");
